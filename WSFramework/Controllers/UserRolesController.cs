@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using WSFramework.Models;
-using WSFramework.Providers;
+using WSFramework.Helpers;
 
 namespace WSFramework.Controllers
 {
@@ -30,7 +30,7 @@ namespace WSFramework.Controllers
             IList<AspNetUserRole> aspNetUserRole = await db.AspNetUserRoles.Where(p => p.UserId.ToString() == id).ToListAsync();
             if (aspNetUserRole == null)
             {
-                return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
+                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
             }
 
             return Ok(aspNetUserRole);
@@ -61,7 +61,7 @@ namespace WSFramework.Controllers
             {
                 if (!AspNetUserRoleExists(aspNetUserRole))
                 {
-                    return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
+                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
                 }
                 else
                 {
@@ -92,7 +92,7 @@ namespace WSFramework.Controllers
             {
                 if (AspNetUserRoleExists(aspNetUserRole))
                 {
-                    return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.Conflict, "UserRole already present in database."));
+                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "UserRole already present in database."));
                 }
                 else
                 {
@@ -111,7 +111,7 @@ namespace WSFramework.Controllers
             AspNetUserRole aspNetUserRole = await db.AspNetUserRoles.SingleAsync(p => p.UserId == aspNetUserRoleIn.UserId && p.RoleId == aspNetUserRoleIn.RoleId);
             if (aspNetUserRole == null)
             {
-                return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
+                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
             }
 
             db.AspNetUserRoles.Remove(aspNetUserRole);

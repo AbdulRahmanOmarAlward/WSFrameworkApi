@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using WSFramework.Models;
-using WSFramework.Providers;
+using WSFramework.Helpers;
 
 namespace WSFramework.Controllers
 {
@@ -33,7 +33,7 @@ namespace WSFramework.Controllers
             User user = await db.Users.FindAsync(id);
             if (user == null)
             {
-                return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.NotFound, "User ID not present in database."));
+                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "User ID not present in database."));
             }
 
             return Ok(user);
@@ -47,7 +47,7 @@ namespace WSFramework.Controllers
             User user = await db.Users.FindAsync(id);
             if (user == null)
             {
-                return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.NotFound, "User ID not present in database."));
+                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "User ID not present in database."));
             }
 
             db.Users.Remove(user);

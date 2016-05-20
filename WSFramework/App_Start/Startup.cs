@@ -29,7 +29,7 @@ namespace WSFramework.App_Start
                 AllowInsecureHttp = true, //This is for testing
                 TokenEndpointPath = new PathString("/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-                Provider = new SimpleAuthorizationServerProvider()
+                Provider = new AuthorizationServerProvider()
             };
 
             // Token Generation

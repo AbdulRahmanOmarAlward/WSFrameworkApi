@@ -9,7 +9,7 @@ using System.Web;
 
 namespace WSFramework.Providers
 {
-    public class SimpleAuthorizationServerProvider : OAuthAuthorizationServerProvider
+    public class AuthorizationServerProvider : OAuthAuthorizationServerProvider
     {
         public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {

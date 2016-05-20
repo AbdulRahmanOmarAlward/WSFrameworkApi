@@ -5,9 +5,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 
-namespace WSFramework.Providers
+namespace WSFramework.Helpers
 {
-    public static class HttpResponseGenerator
+    public static class HttpResponseHelper
     {
         public static HttpResponseMessage getHttpResponse(HttpStatusCode statusCode, string reasonPhrase)
         {

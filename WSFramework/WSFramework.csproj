@@ -175,6 +175,7 @@
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Context\AuthContext.cs" />
+    <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Controllers\ShopsController.cs" />
     <Compile Include="Controllers\UserRolesController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
@@ -253,12 +254,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>WSDatabase.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Providers\HttpResponseGenerator.cs" />
+    <Compile Include="Helpers\IdentityHelper.cs" />
+    <Compile Include="Helpers\HttpResponseHelper.cs" />
     <Compile Include="Repository\AuthRepository.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\SimpleAuthorizationServerProvider.cs" />
+    <Compile Include="Providers\AuthorizationServerProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
