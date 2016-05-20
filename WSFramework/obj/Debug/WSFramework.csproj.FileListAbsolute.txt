@@ -51,5 +51,58 @@ C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework\
 C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework\bin\Microsoft.Owin.Cors.dll
 C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework\bin\System.Web.Cors.dll
 C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework\bin\Microsoft.Owin.Cors.xml
-C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework\bin\WSFramework.dll.CodeAnalysisLog.xml
-C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework\bin\WSFramework.dll.lastcodeanalysissucceeded
+C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework\obj\Debug\WSFramework.csprojResolveAssemblyReference.cache
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\csc.exe
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\Microsoft.CodeAnalysis.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\Microsoft.CSharp.Core.targets
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\Microsoft.VisualBasic.Core.targets
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\System.Collections.Immutable.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\System.Reflection.Metadata.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\vbc.exe
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\VBCSCompiler.exe
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\roslyn\VBCSCompiler.exe.config
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\WSFramework.dll.config
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\WSFramework.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\WSFramework.pdb
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\EntityFramework.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\EntityFramework.SqlServer.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.AspNet.Identity.Core.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.AspNet.Identity.EntityFramework.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.AspNet.Identity.Owin.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Cors.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Host.SystemWeb.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Security.Cookies.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Security.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Security.OAuth.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Newtonsoft.Json.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Owin.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\System.Net.Http.Formatting.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\System.Web.Cors.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\System.Web.Http.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\System.Web.Http.Owin.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\System.Web.Http.WebHost.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\EntityFramework.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\EntityFramework.SqlServer.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.AspNet.Identity.Core.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.AspNet.Identity.EntityFramework.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.AspNet.Identity.Owin.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Cors.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Host.SystemWeb.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Security.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Security.Cookies.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Microsoft.Owin.Security.OAuth.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\System.Web.Http.Owin.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\Newtonsoft.Json.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\System.Net.Http.Formatting.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\System.Web.Http.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\bin\System.Web.Http.WebHost.xml
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\obj\Debug\WSFramework.csprojResolveAssemblyReference.cache
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\obj\Debug\WSFramework.dll
+C:\Users\Jepp2078\Documents\WSFramework\WSFramework\obj\Debug\WSFramework.pdb

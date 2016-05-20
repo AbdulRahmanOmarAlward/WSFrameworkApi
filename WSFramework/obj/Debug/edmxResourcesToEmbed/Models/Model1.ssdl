@@ -5,6 +5,7 @@ warning 6002: The table/view 'AuthContext.dbo.Users' does not have a primary key
   <EntityType Name="Users">
     <Key>
       <PropertyRef Name="Id" />
+      <PropertyRef Name="UserName" />
     </Key>
     <Property Name="Id" Type="nvarchar" MaxLength="128" Nullable="false" />
     <Property Name="Email" Type="nvarchar" MaxLength="256" />

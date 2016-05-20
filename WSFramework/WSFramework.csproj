@@ -139,16 +139,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Models\Model1.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>User.edmx</DependentUpon>
-      <LastGenOutput>Model1.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Models\Model1.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>User.edmx</DependentUpon>
-      <LastGenOutput>Model1.cs</LastGenOutput>
-    </Content>
     <Content Include="Models\Roles.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>Roles.edmx</DependentUpon>
@@ -159,26 +149,58 @@
       <DependentUpon>Roles.edmx</DependentUpon>
       <LastGenOutput>Roles.cs</LastGenOutput>
     </Content>
+    <Content Include="Models\User.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>User.edmx</DependentUpon>
+      <LastGenOutput>User.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\User.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>User.edmx</DependentUpon>
+      <LastGenOutput>User1.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\WSDatabase.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>WSDatabase.edmx</DependentUpon>
+      <LastGenOutput>WSDatabase.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\WSDatabase.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>WSDatabase.edmx</DependentUpon>
+      <LastGenOutput>WSDatabase.cs</LastGenOutput>
+    </Content>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Context\AuthContext.cs" />
+    <Compile Include="Controllers\ShopsController.cs" />
     <Compile Include="Controllers\UserRolesController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Models\AspNetUserRole.cs">
       <DependentUpon>Roles.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Model1.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.Context.tt</DependentUpon>
+    <Compile Include="Models\Category.cs">
+      <DependentUpon>WSDatabase.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Model1.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model1.tt</DependentUpon>
+    <Compile Include="Models\Customer.cs">
+      <DependentUpon>WSDatabase.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Image.cs">
+      <DependentUpon>WSDatabase.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Order.cs">
+      <DependentUpon>WSDatabase.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\OrdersToProduct.cs">
+      <DependentUpon>WSDatabase.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Product.cs">
+      <DependentUpon>WSDatabase.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ProductsToCategory.cs">
+      <DependentUpon>WSDatabase.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Roles.Context.cs">
       <AutoGen>True</AutoGen>
@@ -195,14 +217,43 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Roles.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\Shop.cs">
+      <DependentUpon>WSDatabase.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\User.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>User.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\User.cs">
+      <DependentUpon>User.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\User.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>User.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models\User.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
+    <Compile Include="Models\User1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>User.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\WSDatabase.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSDatabase.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\WSDatabase.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSDatabase.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\WSDatabase.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSDatabase.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Providers\HttpResponseGenerator.cs" />
     <Compile Include="Repository\AuthRepository.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Models\UserModel.cs" />
@@ -211,6 +262,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <EntityDeploy Include="Models\Roles.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Roles.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\Roles.edmx.diagram">
+      <DependentUpon>Roles.edmx</DependentUpon>
+    </Content>
     <EntityDeploy Include="Models\User.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>User.Designer.cs</LastGenOutput>
@@ -218,12 +276,12 @@
     <Content Include="Models\User.edmx.diagram">
       <DependentUpon>User.edmx</DependentUpon>
     </Content>
-    <EntityDeploy Include="Models\Roles.edmx">
+    <EntityDeploy Include="Models\WSDatabase.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Roles.Designer.cs</LastGenOutput>
+      <LastGenOutput>WSDatabase.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <Content Include="Models\Roles.edmx.diagram">
-      <DependentUpon>Roles.edmx</DependentUpon>
+    <Content Include="Models\WSDatabase.edmx.diagram">
+      <DependentUpon>WSDatabase.edmx</DependentUpon>
     </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

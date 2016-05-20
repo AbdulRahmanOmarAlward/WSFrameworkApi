@@ -3,13 +3,14 @@
   <EntityType Name="User">
     <Key>
       <PropertyRef Name="Id" />
+      <PropertyRef Name="UserName" />
     </Key>
     <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
     <Property Name="Email" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
     <Property Name="PhoneNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="UserName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
   </EntityType>
-  <EntityContainer Name="AuthContextEntities1" annotation:LazyLoadingEnabled="true">
+  <EntityContainer Name="AuthContextEntitiesUser" annotation:LazyLoadingEnabled="true">
     <EntitySet Name="Users" EntityType="Self.User" />
   </EntityContainer>
 </Schema>

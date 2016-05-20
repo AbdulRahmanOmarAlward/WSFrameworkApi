@@ -43,5 +43,3 @@ C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework.
 C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework.Tests\bin\Debug\Microsoft.Owin.Cors.xml
 C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework.Tests\bin\Debug\System.Web.Http.Owin.xml
 C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework.Tests\bin\Debug\Microsoft.Owin.Security.xml
-C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework.Tests\bin\Debug\WSFramework.Tests.dll.CodeAnalysisLog.xml
-C:\Users\Jepp2078\documents\visual studio 2015\Projects\WSFramework\WSFramework.Tests\bin\Debug\WSFramework.Tests.dll.lastcodeanalysissucceeded

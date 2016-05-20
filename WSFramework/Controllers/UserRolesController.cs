@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using WSFramework.Models;
+using WSFramework.Providers;
 
 namespace WSFramework.Controllers
 {
@@ -26,12 +25,12 @@ namespace WSFramework.Controllers
         // GET: api/UserRoles/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(AspNetUserRole))]
-        public IHttpActionResult GetAspNetUserRole(string id)
+        public async Task<IHttpActionResult> GetAspNetUserRole(string id)
         {
-            IList<AspNetUserRole> aspNetUserRole = db.AspNetUserRoles.Where(p => p.UserId.ToString() == id).ToList();
+            IList<AspNetUserRole> aspNetUserRole = await db.AspNetUserRoles.Where(p => p.UserId.ToString() == id).ToListAsync();
             if (aspNetUserRole == null)
             {
-                return NotFound();
+                return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
             }
 
             return Ok(aspNetUserRole);
@@ -40,7 +39,7 @@ namespace WSFramework.Controllers
         // PUT: api/UserRoles/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(void))]
-        public IHttpActionResult PutAspNetUserRole(string id, AspNetUserRole aspNetUserRole)
+        public async Task<IHttpActionResult> PutAspNetUserRole(string id, AspNetUserRole aspNetUserRole)
         {
             if (!ModelState.IsValid)
             {
@@ -56,13 +55,13 @@ namespace WSFramework.Controllers
 
             try
             {
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AspNetUserRoleExists(id))
+                if (!AspNetUserRoleExists(aspNetUserRole))
                 {
-                    return NotFound();
+                    return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
                 }
                 else
                 {
@@ -76,7 +75,7 @@ namespace WSFramework.Controllers
         // POST: api/UserRoles
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(AspNetUserRole))]
-        public IHttpActionResult PostAspNetUserRole(AspNetUserRole aspNetUserRole)
+        public async Task<IHttpActionResult> PostAspNetUserRole(AspNetUserRole aspNetUserRole)
         {
             if (!ModelState.IsValid)
             {
@@ -87,13 +86,13 @@ namespace WSFramework.Controllers
 
             try
             {
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (AspNetUserRoleExists(aspNetUserRole.UserId))
+                if (AspNetUserRoleExists(aspNetUserRole))
                 {
-                    return Conflict();
+                    return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.Conflict, "UserRole already present in database."));
                 }
                 else
                 {
@@ -101,22 +100,22 @@ namespace WSFramework.Controllers
                 }
             }
 
-            return CreatedAtRoute("api/UserRoles", new { id = aspNetUserRole.UserId }, aspNetUserRole);
+            return CreatedAtRoute("DefaultApi", new { id = aspNetUserRole.UserId }, aspNetUserRole);
         }
 
-        // DELETE: api/UserRoles
+        // DELETE: api/UserRoles/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(AspNetUserRole))]
-        public IHttpActionResult DeleteAspNetUserRole(AspNetUserRole aspNetUserRoleIn)
+        public async Task<IHttpActionResult> DeleteAspNetUserRole(AspNetUserRole aspNetUserRoleIn)
         {
-            AspNetUserRole aspNetUserRole = db.AspNetUserRoles.Single(p => p.UserId == aspNetUserRoleIn.UserId && p.RoleId == aspNetUserRoleIn.RoleId);
+            AspNetUserRole aspNetUserRole = await db.AspNetUserRoles.SingleAsync(p => p.UserId == aspNetUserRoleIn.UserId && p.RoleId == aspNetUserRoleIn.RoleId);
             if (aspNetUserRole == null)
             {
-                return NotFound();
+                return ResponseMessage(HttpResponseGenerator.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
             }
 
             db.AspNetUserRoles.Remove(aspNetUserRole);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             return Ok(aspNetUserRole);
         }
@@ -130,9 +129,9 @@ namespace WSFramework.Controllers
             base.Dispose(disposing);
         }
 
-        private bool AspNetUserRoleExists(string id)
+        private bool AspNetUserRoleExists(AspNetUserRole userRole)
         {
-            return db.AspNetUserRoles.Count(e => e.UserId == id) > 0;
+            return db.AspNetUserRoles.Count(e => e.UserId == userRole.UserId && e.RoleId == userRole.RoleId) > 0;
         }
     }
 }
