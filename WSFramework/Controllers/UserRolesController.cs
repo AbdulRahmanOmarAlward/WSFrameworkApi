@@ -29,10 +29,8 @@ namespace WSFramework.Controllers
         {
             IList<AspNetUserRole> aspNetUserRole = await db.AspNetUserRoles.Where(p => p.UserId.ToString() == id).ToListAsync();
             if (aspNetUserRole == null)
-            {
                 return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
-            }
-
+            
             return Ok(aspNetUserRole);
         }
 
@@ -42,15 +40,11 @@ namespace WSFramework.Controllers
         public async Task<IHttpActionResult> PutAspNetUserRole(string id, AspNetUserRole aspNetUserRole)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
-
+            
             if (id != aspNetUserRole.UserId)
-            {
                 return BadRequest();
-            }
-
+            
             db.Entry(aspNetUserRole).State = EntityState.Modified;
 
             try
@@ -78,10 +72,8 @@ namespace WSFramework.Controllers
         public async Task<IHttpActionResult> PostAspNetUserRole(AspNetUserRole aspNetUserRole)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
-
+            
             db.AspNetUserRoles.Add(aspNetUserRole);
 
             try
@@ -110,10 +102,8 @@ namespace WSFramework.Controllers
         {
             AspNetUserRole aspNetUserRole = await db.AspNetUserRoles.SingleAsync(p => p.UserId == aspNetUserRoleIn.UserId && p.RoleId == aspNetUserRoleIn.RoleId);
             if (aspNetUserRole == null)
-            {
                 return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "UserRole not present in database."));
-            }
-
+            
             db.AspNetUserRoles.Remove(aspNetUserRole);
             await db.SaveChangesAsync();
 

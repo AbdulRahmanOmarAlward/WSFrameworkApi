@@ -32,9 +32,7 @@ namespace WSFramework.Controllers
         {
             User user = await db.Users.FindAsync(id);
             if (user == null)
-            {
                 return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "User ID not present in database."));
-            }
 
             return Ok(user);
         }
@@ -46,14 +44,20 @@ namespace WSFramework.Controllers
         {
             User user = await db.Users.FindAsync(id);
             if (user == null)
-            {
                 return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "User ID not present in database."));
-            }
-
+            
             db.Users.Remove(user);
             await db.SaveChangesAsync();
-
             return Ok(user);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

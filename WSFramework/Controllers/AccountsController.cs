@@ -21,18 +21,15 @@ namespace WSFramework.Controllers
         public async Task<IHttpActionResult> Register(UserModel userModel)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
+            
 
             IdentityResult result = await _repo.RegisterUser(userModel);
 
             IHttpActionResult errorResult = GetErrorResult(result);
 
             if (errorResult != null)
-            {
                 return errorResult;
-            }
 
             return Ok();
         }
@@ -66,7 +63,6 @@ namespace WSFramework.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    // No ModelState errors are available to send, so just return an empty BadRequest.
                     return BadRequest();
                 }
 

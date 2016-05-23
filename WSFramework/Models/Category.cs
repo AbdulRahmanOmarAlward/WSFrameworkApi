@@ -17,7 +17,6 @@ namespace WSFramework.Models
         public long Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public Nullable<long> CategoryId { get; set; }
         public string Image { get; set; }
         public Nullable<int> IsActive { get; set; }
         public Nullable<System.DateTime> CreatedAt { get; set; }

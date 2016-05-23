@@ -16,6 +16,6 @@ namespace WSFramework.Models
     {
         public long Id { get; set; }
         public Nullable<long> ProductId { get; set; }
-        public string image1 { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

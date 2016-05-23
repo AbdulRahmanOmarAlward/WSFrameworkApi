@@ -12,7 +12,6 @@
           <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Title" Type="varchar" MaxLength="50" />
           <Property Name="Description" Type="varchar" MaxLength="200" Nullable="false" />
-          <Property Name="CategoryId" Type="bigint" />
           <Property Name="Image" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="IsActive" Type="int" />
           <Property Name="CreatedAt" Type="datetime" />
@@ -113,7 +112,6 @@
           <Property Name="Id" Type="Int64" Nullable="false" />
           <Property Name="Title" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Description" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="CategoryId" Type="Int64" />
           <Property Name="Image" Type="String" MaxLength="250" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="IsActive" Type="Int32" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
@@ -135,7 +133,7 @@
           </Key>
           <Property Name="Id" Type="Int64" Nullable="false" />
           <Property Name="ProductId" Type="Int64" />
-          <Property Name="image1" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="ImageUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -184,7 +182,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int64" Nullable="false" />
-          <Property Name="UserId" Type="String" />
+          <Property Name="UserId" Type="String" MaxLength="128" Unicode="false" FixedLength="false" />
           <Property Name="Title" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Description" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="DescriptionFull" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
@@ -215,7 +213,6 @@
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
                 <ScalarProperty Name="Image" ColumnName="Image" />
                 <ScalarProperty Name="IsActive" ColumnName="IsActive" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
@@ -239,7 +236,7 @@
               <MappingFragment StoreEntitySet="Images">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ProductId" ColumnName="ProductId" />
-                <ScalarProperty Name="image1" ColumnName="image" />
+                <ScalarProperty Name="ImageUrl" ColumnName="image" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
