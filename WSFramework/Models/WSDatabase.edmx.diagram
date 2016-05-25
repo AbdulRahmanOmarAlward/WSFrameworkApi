@@ -8,11 +8,11 @@
         <EntityTypeShape EntityType="WSFrameworkDBModel.Category" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="WSFrameworkDBModel.Customer" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="WSFrameworkDBModel.Image" Width="1.5" PointX="8.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="WSFrameworkDBModel.Order" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="WSFrameworkDBModel.OrdersToProduct" Width="2.375" PointX="3.25" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="WSFrameworkDBModel.Product" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="WSFrameworkDBModel.ProductsToCategory" Width="2.5" PointX="0.5" PointY="3.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="WSFrameworkDBModel.Shop" Width="1.5" PointX="6.5" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="WSFrameworkDBModel.Shop" Width="1.5" PointX="8.625" PointY="3.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="WSFrameworkDBModel.Order" Width="1.5" PointX="4.625" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

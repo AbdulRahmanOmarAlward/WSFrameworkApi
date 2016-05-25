@@ -5,7 +5,7 @@ using WSFramework.Models;
 
 namespace WSFramework.Controllers
 {
-    [RoutePrefix("api/Users")]
+    [RoutePrefix("Users")]
     public class AccountsController : ApiController
     {
         private AuthRepository _repo = null;
@@ -15,7 +15,7 @@ namespace WSFramework.Controllers
             _repo = new AuthRepository();
         }
 
-        // POST api/Users/Register
+        // POST /Users/Register
         [AllowAnonymous]
         [Route("Register")]
         public async Task<IHttpActionResult> Register(UserModel userModel)

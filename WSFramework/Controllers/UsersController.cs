@@ -18,14 +18,14 @@ namespace WSFramework.Controllers
     {
         private AuthContextEntitiesUsers db = new AuthContextEntitiesUsers();
 
-        // GET: api/Users
+        // GET: /Users
         [Authorize(Roles = "Admin")]
         public IQueryable<User> GetUsers()
         {
             return db.Users;
         }
 
-        // GET: api/Users/5
+        // GET: /Users/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(User))]
         public async Task<IHttpActionResult> GetUser(string id)
@@ -37,7 +37,7 @@ namespace WSFramework.Controllers
             return Ok(user);
         }
 
-        // DELETE: api/Users/5
+        // DELETE: /Users/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(User))]
         public async Task<IHttpActionResult> DeleteUser(string id)

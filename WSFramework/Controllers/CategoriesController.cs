@@ -30,13 +30,13 @@ namespace WSFramework.Controllers
             public string imageUrl { get; set; }
         }
 
-        // GET: api/Categories
+        // GET: /Categories
         public IQueryable<Category> GetCategories()
         {
             return db.Categories;
         }
 
-        // GET: api/Categories/5
+        // GET: /Categories/5
         [ResponseType(typeof(Category))]
         public async Task<IHttpActionResult> GetCategory(long id)
         {
@@ -47,7 +47,7 @@ namespace WSFramework.Controllers
             return Ok(category);
         }
 
-        // PUT: api/Categories/5
+        // PUT: /Categories/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutCategory(long id, CategoryUpdate categoryIn)
@@ -94,7 +94,7 @@ namespace WSFramework.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/Categories
+        // POST: /Categories
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(Category))]
         public async Task<IHttpActionResult> PostCategory(CategoryIn categoryIn)
@@ -132,10 +132,10 @@ namespace WSFramework.Controllers
                 }
             }
 
-            return CreatedAtRoute("DefaultApi", new { id = newCategory.Id }, newCategory);
+            return CreatedAtRoute("WSApi", new { id = newCategory.Id }, newCategory);
         }
 
-        // DELETE: api/Categories/5
+        // DELETE: /Categories/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(Category))]
         public async Task<IHttpActionResult> DeleteCategory(long id)

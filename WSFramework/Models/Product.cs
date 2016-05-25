@@ -18,10 +18,12 @@ namespace WSFramework.Models
         public string Title { get; set; }
         public string Description { get; set; }
         public string DescriptionFull { get; set; }
-        public Nullable<long> Views { get; set; }
-        public Nullable<int> IsActive { get; set; }
-        public Nullable<System.DateTime> CreatedAt { get; set; }
-        public Nullable<System.DateTime> UpdatedAt { get; set; }
-        public Nullable<long> ShopId { get; set; }
+        public long Views { get; set; }
+        public int IsActive { get; set; }
+        public System.DateTime CreatedAt { get; set; }
+        public System.DateTime UpdatedAt { get; set; }
+        public long ShopId { get; set; }
+        public int Stock { get; set; }
+        public Nullable<double> Price { get; set; }
     }
 }

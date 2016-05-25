@@ -15,10 +15,13 @@ namespace WSFramework.Models
     public partial class Order
     {
         public long Id { get; set; }
-        public string CustomerId { get; set; }
+        public long CustomerId { get; set; }
         public string ShippingAddress { get; set; }
         public string BillingAddress { get; set; }
-        public Nullable<System.DateTime> CreatedAt { get; set; }
-        public Nullable<int> Status { get; set; }
+        public System.DateTime CreatedAt { get; set; }
+        public System.DateTime UpdatedAt { get; set; }
+        public int Status { get; set; }
+        public long ShopId { get; set; }
+        public double Amount { get; set; }
     }
 }

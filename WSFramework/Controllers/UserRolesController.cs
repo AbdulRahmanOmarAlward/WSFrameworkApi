@@ -15,14 +15,14 @@ namespace WSFramework.Controllers
     {
         private AuthContextEntities2 db = new AuthContextEntities2();
 
-        // GET: api/UserRoles
+        // GET: /UserRoles
         [Authorize(Roles = "Admin")]
         public IQueryable<AspNetUserRole> GetAspNetUserRoles()
         {
             return db.AspNetUserRoles;
         }
 
-        // GET: api/UserRoles/5
+        // GET: /UserRoles/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(AspNetUserRole))]
         public async Task<IHttpActionResult> GetAspNetUserRole(string id)
@@ -34,7 +34,7 @@ namespace WSFramework.Controllers
             return Ok(aspNetUserRole);
         }
 
-        // PUT: api/UserRoles/5
+        // PUT: /UserRoles/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutAspNetUserRole(string id, AspNetUserRole aspNetUserRole)
@@ -66,7 +66,7 @@ namespace WSFramework.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/UserRoles
+        // POST: /UserRoles
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(AspNetUserRole))]
         public async Task<IHttpActionResult> PostAspNetUserRole(AspNetUserRole aspNetUserRole)
@@ -92,10 +92,10 @@ namespace WSFramework.Controllers
                 }
             }
 
-            return CreatedAtRoute("DefaultApi", new { id = aspNetUserRole.UserId }, aspNetUserRole);
+            return CreatedAtRoute("WSApi", new { id = aspNetUserRole.UserId }, aspNetUserRole);
         }
 
-        // DELETE: api/UserRoles/5
+        // DELETE: /UserRoles/5
         [Authorize(Roles = "Admin")]
         [ResponseType(typeof(AspNetUserRole))]
         public async Task<IHttpActionResult> DeleteAspNetUserRole(AspNetUserRole aspNetUserRoleIn)

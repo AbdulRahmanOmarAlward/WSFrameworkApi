@@ -21,7 +21,7 @@ namespace WSFramework.Controllers
         public string DescriptionFull { get; set; }
     }
 
-    class ShopOut : Shop
+    class ShopProducts
     {
         public IList<ProductOut> Products { get; set; }
     }
@@ -38,30 +38,34 @@ namespace WSFramework.Controllers
     {
         private WSFrameworkDBEntitiesFull db = new WSFrameworkDBEntitiesFull();
 
-        // GET: api/Shops
+        // GET: /Shops
         public IQueryable<Shop> GetShops()
         {
             return db.Shops;
         }
 
-        // GET: api/Shops/5
-        [ResponseType(typeof(ShopOut))]
+        // GET: /Shops/5
+        [Route("Shops/{id}/")]
+        [ResponseType(typeof(Shop))]
         public async Task<IHttpActionResult> GetShop(long id)
         {
             Shop shop = await db.Shops.FindAsync(id);
             if (shop == null)
                 return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Shop ID not present in database."));
 
-            ShopOut shopOut = new ShopOut();
-            shopOut.Id = shop.Id;
-            shopOut.UserId = shop.UserId;
-            shopOut.Title = shop.Title;
-            shopOut.Description = shop.Description;
-            shopOut.DescriptionFull = shop.DescriptionFull;
-            shopOut.Views = shop.Views;
-            shopOut.IsActive = shop.IsActive;
-            shopOut.CreatedAt = shop.CreatedAt;
-            shopOut.UpdatedAt = shop.UpdatedAt;
+            return Ok(shop);
+        }
+
+        // GET: /Shops/5/products
+        [Route("Shops/{id}/products")]
+        [ResponseType(typeof(ShopProducts))]
+        public async Task<IHttpActionResult> GetShopProducts(long id)
+        {
+            Shop shop = await db.Shops.FindAsync(id);
+            if (shop == null)
+                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Shop ID not present in database."));
+
+            ShopProducts shopOut = new ShopProducts();
             shopOut.Products = new List<ProductOut>();
             IList<Product> productsInShop = new List<Product>();
             productsInShop = await db.Products.Where(p => p.ShopId == id).ToListAsync();
@@ -75,8 +79,7 @@ namespace WSFramework.Controllers
 
             return Ok(shopOut);
         }
-
-        // PUT: api/Shops/5
+        // PUT: /Shops/5
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutShop(long id, ShopUpdate shopIn)
@@ -130,16 +133,21 @@ namespace WSFramework.Controllers
             return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to modify this data."));
         }
 
-        // POST: api/Shops
+        // POST: /Shops
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(Shop))]
         public async Task<IHttpActionResult> PostShop(ShopIn shop)
         {
             if (ShopTitleExists(shop.Title))
                 return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Shop title already taken."));
-            
 
             IdentityHelper identity = getIdentity();
+
+            if((await db.Shops.CountAsync(p => p.UserId == identity.userId)) > 0)
+            {
+                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "User ID already has a shop."));
+            }
+
             Shop newShop = new Shop();
             newShop.UserId = identity.userId;
             newShop.Title = shop.Title;
@@ -172,10 +180,10 @@ namespace WSFramework.Controllers
                 }
             }
 
-            return CreatedAtRoute("DefaultApi", new { id = newShop.Id }, newShop);
+            return CreatedAtRoute("WSApi", new { id = newShop.Id }, newShop);
         }
 
-        // DELETE: api/Shops/5
+        // DELETE: /Shops/5
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(Shop))]
         public async Task<IHttpActionResult> DeleteShop(long id)
@@ -235,6 +243,7 @@ namespace WSFramework.Controllers
             productOut.CreatedAt = product.CreatedAt;
             productOut.UpdatedAt = product.UpdatedAt;
             productOut.ShopId = product.ShopId;
+            productOut.Stock = product.Stock;
             if (images != null)
             {
                 productOut.Images = images;

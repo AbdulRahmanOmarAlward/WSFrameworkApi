@@ -28,10 +28,10 @@ namespace WSFramework.Models
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<Image> Images { get; set; }
-        public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrdersToProduct> OrdersToProducts { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductsToCategory> ProductsToCategories { get; set; }
         public virtual DbSet<Shop> Shops { get; set; }
+        public virtual DbSet<Order> Orders { get; set; }
     }
 }

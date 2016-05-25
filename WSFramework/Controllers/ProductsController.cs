@@ -21,17 +21,14 @@ namespace WSFramework.Controllers
         public long ShopId { get; set; }
         public IList<string> Images { get; set; }
         public IList<long> CategoryId { get; set; }
+        public int Stock { get; set; }
+        public float Price { get; set; }
     }
 
     public class ProductOut : Product
     {
         public IList<Image> Images { get; set; }
         public IList<Category> Categories { get; set; }
-
-        public static explicit operator ProductOut(Task<ProductOut> v)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class ProductUpdate
@@ -42,19 +39,21 @@ namespace WSFramework.Controllers
         public int IsActive { get; set; }
         public IList<string> Images { get; set; }
         public IList<long> CategoryId { get; set; }
+        public int Stock { get; set; }
+        public float Price { get; set; }
     }
 
     public class ProductsController : ApiController
     {
         private WSFrameworkDBEntitiesFull db = new WSFrameworkDBEntitiesFull();
 
-        // GET: api/Products
+        // GET: /Products
         public IQueryable<Product> GetProducts()
         {
             return db.Products;
         }
 
-        // GET: api/Products/5
+        // GET: /Products/5
         [ResponseType(typeof(ProductOut))]
         public async Task<IHttpActionResult> GetProduct(long id)
         {
@@ -83,13 +82,14 @@ namespace WSFramework.Controllers
             productOut.ShopId = product.ShopId;
             productOut.Images = images;
             productOut.Categories = categories;
-
+            productOut.Stock = product.Stock;
+            productOut.Price = product.Price;
             await IncrementView(id);
 
             return Ok(productOut);
         }
 
-        // PUT: api/Products/5
+        // PUT: /Products/5
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutProduct(long id, ProductUpdate productIn)
@@ -99,8 +99,7 @@ namespace WSFramework.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            if (productIn.IsActive != 0)
-                if (productIn.IsActive != 1)
+            if (productIn.IsActive != 0 && productIn.IsActive != 1)
                     return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.BadRequest, "IsActive can only be 0 or 1. 0 is inactive. 1 is active."));
 
             Product productCurrent = await db.Products.FindAsync(id);
@@ -108,14 +107,12 @@ namespace WSFramework.Controllers
             if (productCurrent == null)
                 return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Product ID not present in database."));
             
+            string userId = (await db.Shops.FindAsync(productCurrent.ShopId)).UserId;
 
-            Product productToCheck = await db.Products.FindAsync(id);
-            Shop shopToCheck = await db.Shops.FindAsync(productToCheck.ShopId);
-
-            if (identity.userId == shopToCheck.UserId || identity.role == "Admin")
+            if (identity.userId == userId || identity.role == "Admin")
             {
                 if (productCurrent.Title != productIn.Title)
-                    if (ProductTitleExistsInShop(productIn.Title, (long)productToCheck.ShopId))
+                    if (ProductTitleExistsInShop(productIn.Title, (long)productCurrent.ShopId))
                         return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Product title already present in shop."));
 
                 productCurrent.Title = (productIn.Title != null) ? productIn.Title : productCurrent.Title;
@@ -123,6 +120,8 @@ namespace WSFramework.Controllers
                 productCurrent.DescriptionFull = (productIn.DescriptionFull != null) ? productIn.DescriptionFull : productCurrent.DescriptionFull;
                 productCurrent.UpdatedAt = DateTime.Now;
                 productCurrent.IsActive = productIn.IsActive;
+                productCurrent.Stock = productIn.Stock;
+                productCurrent.Price = productIn.Price;
                 db.Entry(productCurrent).State = EntityState.Modified;
 
                 try
@@ -199,7 +198,7 @@ namespace WSFramework.Controllers
             return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to modify this data."));
         }
 
-        // POST: api/Products
+        // POST: /Products
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(Product))]
         public async Task<IHttpActionResult> PostProduct(ProductIn productIn)
@@ -228,6 +227,8 @@ namespace WSFramework.Controllers
             newProduct.CreatedAt = now;
             newProduct.UpdatedAt = now;
             newProduct.ShopId = productIn.ShopId;
+            newProduct.Stock = productIn.Stock;
+            newProduct.Price = productIn.Price;
 
             db.Products.Add(newProduct);
         
@@ -287,10 +288,10 @@ namespace WSFramework.Controllers
                 }
             }
 
-            return CreatedAtRoute("DefaultApi", new { id = newProduct.Id }, newProduct);
+            return CreatedAtRoute("WSApi", new { id = newProduct.Id }, newProduct);
         }
 
-        // DELETE: api/Products/5
+        // DELETE: /Products/5
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(Product))]
         public async Task<IHttpActionResult> DeleteProduct(long id)

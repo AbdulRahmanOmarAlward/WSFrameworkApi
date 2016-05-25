@@ -16,6 +16,6 @@ namespace WSFramework.Models
     {
         public long OrderId { get; set; }
         public long ProductId { get; set; }
-        public long Amount { get; set; }
+        public long Quantity { get; set; }
     }
 }
