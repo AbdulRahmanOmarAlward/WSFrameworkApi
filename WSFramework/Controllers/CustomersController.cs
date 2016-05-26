@@ -76,6 +76,36 @@ namespace WSFramework.Controllers
             }
         }
 
+        // GET: /Customers/5
+        [Route("Customers/{id}/Orders")]
+        [Authorize(Roles = "Admin, User")]
+        [ResponseType(typeof(IList<Order>))]
+        public async Task<IHttpActionResult> GetCustomerOrders(long id)
+        {
+            IdentityHelper identity = getIdentity();
+
+            if (identity.role == "Admin")
+            {
+                return Ok(await db.Orders.Where(p => p.CustomerId == id).ToListAsync());
+            }
+            else
+            {
+                Customer customer = await db.Customers.FindAsync(id);
+                if (customer == null)
+                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Customer ID not present in database."));
+                long shopId = ((Shop)await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId)).Id;
+                if (customer.ShopId == shopId)
+                {
+                    return Ok(await db.Orders.Where(p => p.CustomerId == id).ToListAsync());
+                }
+                else
+                {
+                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to view this data."));
+
+                }
+            }
+        }
+
         // PUT: /Customers/5
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(void))]

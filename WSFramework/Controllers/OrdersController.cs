@@ -100,12 +100,19 @@ namespace WSFramework.Controllers
 
         // GET: /Orders/5/products
         [Route("Orders/{id}/products")]
+        [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(OrderProducts))]
         public async Task<IHttpActionResult> GetOrderProducts(long id)
         {
+            IdentityHelper identity = getIdentity();
+
             Order order = await db.Orders.FindAsync(id);
             if (order == null)
                 return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Order ID not present in database."));
+
+            if (identity.role != "Admin")
+                if (order.ShopId != (await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId)).Id)
+                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to see this data."));
 
             OrderProducts orderOut = new OrderProducts();
             orderOut.Products = new List<ProductOutOrder>();
