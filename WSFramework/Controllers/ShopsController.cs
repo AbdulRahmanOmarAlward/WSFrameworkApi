@@ -244,6 +244,7 @@ namespace WSFramework.Controllers
             productOut.UpdatedAt = product.UpdatedAt;
             productOut.ShopId = product.ShopId;
             productOut.Stock = product.Stock;
+            productOut.Price = product.Price;
             if (images != null)
             {
                 productOut.Images = images;
