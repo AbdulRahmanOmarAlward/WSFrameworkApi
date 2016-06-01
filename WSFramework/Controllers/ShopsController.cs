@@ -56,6 +56,19 @@ namespace WSFramework.Controllers
             return Ok(shop);
         }
 
+        // GET: /Shops/Own
+        [Route("Shops/Own/")]
+        [ResponseType(typeof(Shop))]
+        public async Task<IHttpActionResult> GetOwnShop()
+        {
+            IdentityHelper identity = getIdentity();
+            Shop shop = await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId);
+            if (shop == null)
+                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "No shop present for current user"));
+
+            return Ok(shop);
+        }
+
         // GET: /Shops/5/products
         [Route("Shops/{id}/products")]
         [ResponseType(typeof(ShopProducts))]
@@ -79,7 +92,8 @@ namespace WSFramework.Controllers
 
             return Ok(shopOut);
         }
-        // PUT: /Shops/5
+        // PUT: /Shops/5+
+        [Route("Shops/{id}/")]
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutShop(long id, ShopUpdate shopIn)
@@ -184,6 +198,7 @@ namespace WSFramework.Controllers
         }
 
         // DELETE: /Shops/5
+        [Route("Shops/{id}/")]
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(Shop))]
         public async Task<IHttpActionResult> DeleteShop(long id)
