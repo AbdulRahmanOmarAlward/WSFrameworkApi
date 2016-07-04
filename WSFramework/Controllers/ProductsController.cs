@@ -10,6 +10,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using WSFramework.Models;
 using WSFramework.Helpers;
+using System.Net.Http;
 
 namespace WSFramework.Controllers
 {
@@ -43,7 +44,7 @@ namespace WSFramework.Controllers
         public float Price { get; set; }
     }
 
-    public class ProductsController : ApiController
+    public class ProductsController : ApiController, WSFController
     {
         private WSFrameworkDBEntitiesFull db = new WSFrameworkDBEntitiesFull();
 
@@ -59,7 +60,7 @@ namespace WSFramework.Controllers
         {
             Product product = await db.Products.FindAsync(id);
             if (product == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Product ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             IList<Image> images = await db.Images.Where(p => p.ProductId == id).ToListAsync();
             IList<ProductsToCategory> productToCategories = await db.ProductsToCategories.Where(p => p.ProductId == id).ToListAsync();
@@ -89,23 +90,66 @@ namespace WSFramework.Controllers
             return Ok(productOut);
         }
 
+        // GET: /Products/Own
+        [Route("Products/Own/")]
+        [ResponseType(typeof(ProductOut))]
+        public async Task<IHttpActionResult> GetProductOwn()
+        {
+            CurrentIdentity identity = getIdentity();
+            long shopId = (await db.Shops.Where(p => p.UserId == identity.userId).FirstOrDefaultAsync()).Id;
+            List<Product> products = await db.Products.Where(p => p.ShopId == shopId).ToListAsync();
+            if (products == null)
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
+
+            List<ProductOut> productsOut = new List<ProductOut>();
+            foreach (var product in products)
+            {
+                IList<Image> images = await db.Images.Where(p => p.ProductId == product.Id).ToListAsync();
+                IList<ProductsToCategory> productToCategories = await db.ProductsToCategories.Where(p => p.ProductId == product.Id).ToListAsync();
+                IList<Category> categories = new List<Category>();
+
+                foreach (var categoryEach in productToCategories)
+                {
+                    categories.Add(await db.Categories.FirstOrDefaultAsync(p => p.Id == categoryEach.CategoryId));
+                }
+
+                ProductOut productOut = new ProductOut();
+                productOut.Id = product.Id;
+                productOut.Title = product.Title;
+                productOut.Description = product.Description;
+                productOut.DescriptionFull = product.DescriptionFull;
+                productOut.Views = product.Views;
+                productOut.IsActive = product.IsActive;
+                productOut.CreatedAt = product.CreatedAt;
+                productOut.UpdatedAt = product.UpdatedAt;
+                productOut.ShopId = product.ShopId;
+                productOut.Images = images;
+                productOut.Categories = categories;
+                productOut.Stock = product.Stock;
+                productOut.Price = product.Price;
+                productsOut.Add(productOut);
+            }
+
+            return Ok(productsOut);
+        }
+
         // PUT: /Products/5
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutProduct(long id, ProductUpdate productIn)
         {
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
             if (productIn.IsActive != 0 && productIn.IsActive != 1)
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.BadRequest, "IsActive can only be 0 or 1. 0 is inactive. 1 is active."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.BadRequest));
 
             Product productCurrent = await db.Products.FindAsync(id);
 
             if (productCurrent == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Product ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
             
             string userId = (await db.Shops.FindAsync(productCurrent.ShopId)).UserId;
 
@@ -113,7 +157,7 @@ namespace WSFramework.Controllers
             {
                 if (productCurrent.Title != productIn.Title)
                     if (ProductTitleExistsInShop(productIn.Title, (long)productCurrent.ShopId))
-                        return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Product title already present in shop."));
+                        return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
 
                 productCurrent.Title = (productIn.Title != null) ? productIn.Title : productCurrent.Title;
                 productCurrent.Description = (productIn.Description != null) ? productIn.Description : productCurrent.Description;
@@ -132,7 +176,7 @@ namespace WSFramework.Controllers
                 {
                     if (!ProductExists(id))
                     {
-                        return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Product ID not present in database."));
+                        return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
                     }
                     else
                     {
@@ -195,27 +239,27 @@ namespace WSFramework.Controllers
 
                 return StatusCode(HttpStatusCode.NoContent);
             }
-            return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to modify this data."));
+            return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
         }
 
         // POST: /Products
         [Authorize(Roles = "Admin, User")]
-        [ResponseType(typeof(Product))]
+        [ResponseType(typeof(ProductIn))]
         public async Task<IHttpActionResult> PostProduct(ProductIn productIn)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
             Shop shopToCheck = await db.Shops.FindAsync(productIn.ShopId);
             Product productsToCheck = await db.Products.FindAsync(productIn.ShopId);
 
             if (shopToCheck.UserId != identity.userId)
                 if(identity.role != "Admin")
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "Not owner of provided shop ID."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Forbidden));
 
             if(ProductTitleExistsInShop(productIn.Title, productIn.ShopId))
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Shop already has a product with that title."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
 
             Product newProduct = new Product();
             newProduct.Title = productIn.Title;
@@ -240,7 +284,7 @@ namespace WSFramework.Controllers
             {
                 if (ProductExists(newProduct.Id))
                 {
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Product ID already present in database."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
                 }
                 else
                 {
@@ -296,11 +340,11 @@ namespace WSFramework.Controllers
         [ResponseType(typeof(Product))]
         public async Task<IHttpActionResult> DeleteProduct(long id)
         {
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
 
             Product product = await db.Products.FindAsync(id);
             if (product == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Product ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
             
             Shop shop = await db.Shops.FindAsync(product.ShopId);
             IList <Image> images = await db.Images.Where(p => p.ProductId == id).ToListAsync();
@@ -320,7 +364,7 @@ namespace WSFramework.Controllers
                 await db.SaveChangesAsync();
                 return Ok(product);
             }
-            return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to modify this data."));
+            return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
         }
 
         private async Task IncrementView(long id)
@@ -330,7 +374,7 @@ namespace WSFramework.Controllers
             db.Entry(productCurrent).State = EntityState.Modified;
 
             try
-            {
+            {   
                 await db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -357,16 +401,46 @@ namespace WSFramework.Controllers
             return db.Products.Count(e => e.Title == title && e.ShopId == shopId) > 0;
         }
 
-        private IdentityHelper getIdentity()
+        private CurrentIdentity getIdentity()
         {
             var identity = (ClaimsIdentity)User.Identity;
             IEnumerable<Claim> claims = identity.Claims;
             string userId = claims.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
             string role = claims.FirstOrDefault(p => p.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").Value;
-            IdentityHelper identityOut = new IdentityHelper();
+            CurrentIdentity identityOut = new CurrentIdentity();
             identityOut.userId = userId;
             identityOut.role = role;
             return identityOut;
+        }
+
+        public HttpResponseMessage getHttpResponse(HttpStatusCode statusCode)
+        {
+            HttpResponseMessage resp = new HttpResponseMessage();
+            resp.StatusCode = statusCode;
+            string reasonPhrase;
+            switch (statusCode)
+            {
+                case HttpStatusCode.NotFound:
+                    reasonPhrase = "Product ID not present in database.";
+                    break;
+                case HttpStatusCode.Conflict:
+                    reasonPhrase = "Shop already has a product with that title.";
+                    break;
+                case HttpStatusCode.Forbidden:
+                    reasonPhrase = "Not owner of provided shop ID.";
+                    break;
+                case HttpStatusCode.BadRequest:
+                    reasonPhrase = "isActive can only be 0 or 1. 0 is inactive. 1 is active.";
+                    break;
+                case HttpStatusCode.Unauthorized:
+                    reasonPhrase = "You are not authorized to modify this data.";
+                    break;
+                default:
+                    reasonPhrase = "Contact service provider.";
+                    break;
+            }
+            resp.ReasonPhrase = reasonPhrase;
+            return resp;
         }
     }
 }

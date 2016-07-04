@@ -14,7 +14,7 @@ using WSFramework.Helpers;
 
 namespace WSFramework.Controllers
 {
-    public class UsersController : ApiController
+    public class UsersController : ApiController, WSFController
     {
         private AuthContextEntitiesUsers db = new AuthContextEntitiesUsers();
 
@@ -32,7 +32,7 @@ namespace WSFramework.Controllers
         {
             User user = await db.Users.FindAsync(id);
             if (user == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "User ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             return Ok(user);
         }
@@ -44,7 +44,7 @@ namespace WSFramework.Controllers
         {
             User user = await db.Users.FindAsync(id);
             if (user == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "User ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
             
             db.Users.Remove(user);
             await db.SaveChangesAsync();
@@ -58,6 +58,24 @@ namespace WSFramework.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public HttpResponseMessage getHttpResponse(HttpStatusCode statusCode)
+        {
+            HttpResponseMessage resp = new HttpResponseMessage();
+            resp.StatusCode = statusCode;
+            string reasonPhrase;
+            switch (statusCode)
+            {
+                case HttpStatusCode.NotFound:
+                    reasonPhrase = "User ID not present in database.";
+                    break;
+                default:
+                    reasonPhrase = "Contact service provider.";
+                    break;
+            }
+            resp.ReasonPhrase = reasonPhrase;
+            return resp;
         }
     }
 }

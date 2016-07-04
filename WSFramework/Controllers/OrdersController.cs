@@ -15,7 +15,7 @@ using WSFramework.Models;
 
 namespace WSFramework.Controllers
 {
-    public class OrdersController : ApiController
+    public class OrdersController : ApiController, WSFController
     {
         private WSFrameworkDBEntitiesFull db = new WSFrameworkDBEntitiesFull();
 
@@ -46,6 +46,7 @@ namespace WSFramework.Controllers
         public class OrderIn
         {
             public long CustomerId { get; set; }
+            public long ShopId { get; set; }
             public string ShippingAddress { get; set; }
             public string BillingAddress { get; set; }
             public IList<ProductsInOrder> Products { get; set; }
@@ -55,7 +56,7 @@ namespace WSFramework.Controllers
         [Authorize(Roles = "Admin, User")]
         public IQueryable<Order> GetOrders()
         {
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
 
             if (identity.role == "Admin")
             {
@@ -73,11 +74,11 @@ namespace WSFramework.Controllers
         [ResponseType(typeof(Order))]
         public async Task<IHttpActionResult> GetOrder(long id)
         {
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
 
             Order order = await db.Orders.FindAsync(id);
             if (order == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Order ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             if (identity.role == "Admin")
             {
@@ -92,7 +93,7 @@ namespace WSFramework.Controllers
                 }
                 else
                 {
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to view this data."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
 
                 }
             }
@@ -104,15 +105,15 @@ namespace WSFramework.Controllers
         [ResponseType(typeof(OrderProducts))]
         public async Task<IHttpActionResult> GetOrderProducts(long id)
         {
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
 
             Order order = await db.Orders.FindAsync(id);
             if (order == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Order ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             if (identity.role != "Admin")
                 if (order.ShopId != (await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId)).Id)
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to see this data."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
 
             OrderProducts orderOut = new OrderProducts();
             orderOut.Products = new List<ProductOutOrder>();
@@ -132,18 +133,18 @@ namespace WSFramework.Controllers
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutOrder(long id, OrderUpdate orderIn)
         {
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             Order orderCurrent = await db.Orders.FindAsync(id);
             if (orderCurrent == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Order ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             if (identity.role != "Admin")
                 if (orderCurrent.ShopId != (await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId)).Id)
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to modify this data."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
 
             orderCurrent.ShippingAddress = (orderIn.ShippingAddress != null) ? orderIn.ShippingAddress : orderCurrent.ShippingAddress;
             orderCurrent.BillingAddress = (orderIn.BillingAddress != null) ? orderIn.BillingAddress : orderCurrent.BillingAddress;
@@ -166,12 +167,10 @@ namespace WSFramework.Controllers
         }
 
         // POST: /Orders
-        [Authorize(Roles = "User")]
         [ResponseType(typeof(Order))]
         public async Task<IHttpActionResult> PostOrder(OrderIn orderIn)
         {
-            IdentityHelper identity = getIdentity();
-            long shopId = (await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId)).Id;
+            long shopId = orderIn.ShopId;
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -180,17 +179,17 @@ namespace WSFramework.Controllers
             {
                 Product product = await db.Products.FindAsync(products.ProductId);
                 if(product == null)
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Product ID "+products.ProductId+" not found."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
                 if (product.Stock <= 0)
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Gone, "Product "+product.Title+" sold out."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Gone));
 
                 if(product.Stock - products.Quantity < 0)
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "Product " + product.Title + " doesn't have required stock."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Forbidden));
 
                 if (product.ShopId != shopId)
                 {
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to sell this product."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
                 }
             }
 
@@ -314,16 +313,43 @@ namespace WSFramework.Controllers
             return db.Orders.Count(e => e.Id == id) > 0;
         }
 
-        private IdentityHelper getIdentity()
+        private CurrentIdentity getIdentity()
         {
             var identity = (ClaimsIdentity)User.Identity;
             IEnumerable<Claim> claims = identity.Claims;
             string userId = claims.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
             string role = claims.FirstOrDefault(p => p.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").Value;
-            IdentityHelper identityOut = new IdentityHelper();
+            CurrentIdentity identityOut = new CurrentIdentity();
             identityOut.userId = userId;
             identityOut.role = role;
             return identityOut;
+        }
+
+        public HttpResponseMessage getHttpResponse(HttpStatusCode statusCode)
+        {
+            HttpResponseMessage resp = new HttpResponseMessage();
+            resp.StatusCode = statusCode;
+            string reasonPhrase;
+            switch (statusCode)
+            {
+                case HttpStatusCode.NotFound:
+                    reasonPhrase = "ID not found.";
+                    break;
+                case HttpStatusCode.Gone:
+                    reasonPhrase = "Product sold out.";
+                    break;
+                case HttpStatusCode.Forbidden:
+                    reasonPhrase = "Product doesn't have the required stock to complete this transaction.";
+                    break;
+                case HttpStatusCode.Unauthorized:
+                    reasonPhrase = "You are not authorized to sell this product.";
+                    break;
+                default:
+                    reasonPhrase = "Contact service provider.";
+                    break;
+            }
+            resp.ReasonPhrase = reasonPhrase;
+            return resp;
         }
     }
 }

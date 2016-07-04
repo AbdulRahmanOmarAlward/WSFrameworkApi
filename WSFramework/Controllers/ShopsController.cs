@@ -11,6 +11,7 @@ using System.Web.Http.Description;
 using WSFramework.Models;
 using WSFramework.Helpers;
 using WSFramework.Controllers;
+using System.Net.Http;
 
 namespace WSFramework.Controllers
 {
@@ -34,14 +35,22 @@ namespace WSFramework.Controllers
         public int IsActive { get; set; }
     }
 
-    public class ShopsController : ApiController
+    public class ShopsController : ApiController, WSFController
     {
         private WSFrameworkDBEntitiesFull db = new WSFrameworkDBEntitiesFull();
 
         // GET: /Shops
         public IQueryable<Shop> GetShops()
         {
-            return db.Shops;
+            CurrentIdentity identity = getIdentity();
+            if(identity.role == "Admin")
+            {
+                return db.Shops;
+            }
+            else
+            {
+                return db.Shops.Where(p => p.IsActive == 1);
+            }
         }
 
         // GET: /Shops/5
@@ -51,7 +60,7 @@ namespace WSFramework.Controllers
         {
             Shop shop = await db.Shops.FindAsync(id);
             if (shop == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Shop ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             return Ok(shop);
         }
@@ -61,10 +70,10 @@ namespace WSFramework.Controllers
         [ResponseType(typeof(Shop))]
         public async Task<IHttpActionResult> GetOwnShop()
         {
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
             Shop shop = await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId);
             if (shop == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "No shop present for current user"));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             return Ok(shop);
         }
@@ -76,7 +85,7 @@ namespace WSFramework.Controllers
         {
             Shop shop = await db.Shops.FindAsync(id);
             if (shop == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Shop ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             ShopProducts shopOut = new ShopProducts();
             shopOut.Products = new List<ProductOut>();
@@ -98,25 +107,25 @@ namespace WSFramework.Controllers
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutShop(long id, ShopUpdate shopIn)
         {
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
             if(shopIn.IsActive != 0)
                 if(shopIn.IsActive != 1)
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.BadRequest, "isActive can only be 0 or 1. 0 is inactive. 1 is active."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.BadRequest));
 
             Shop shopCurrent = await db.Shops.FindAsync(id);
             if (shopCurrent == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Shop ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
             
 
             if (identity.userId == shopCurrent.UserId || identity.role == "Admin")
             {
                 if (shopCurrent.Title != shopIn.Title)
                     if (ShopTitleExists(shopIn.Title))
-                        return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Shop title already taken."));
+                        return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
                     
                 shopCurrent.Title = (shopIn.Title != null) ? shopIn.Title : shopCurrent.Title;
                 shopCurrent.Description = (shopIn.Description != null) ? shopIn.Description : shopCurrent.Description;
@@ -133,7 +142,7 @@ namespace WSFramework.Controllers
                 {
                     if (!ShopExists(id))
                     {
-                        return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Shop ID not present in database."));
+                        return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
                     }
                     else
                     {
@@ -144,7 +153,7 @@ namespace WSFramework.Controllers
                 return StatusCode(HttpStatusCode.NoContent);
             }
 
-            return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to modify this data."));
+            return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
         }
 
         // POST: /Shops
@@ -153,13 +162,13 @@ namespace WSFramework.Controllers
         public async Task<IHttpActionResult> PostShop(ShopIn shop)
         {
             if (ShopTitleExists(shop.Title))
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Shop title already taken."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
 
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
 
             if((await db.Shops.CountAsync(p => p.UserId == identity.userId)) > 0)
             {
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "User ID already has a shop."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.Forbidden));
             }
 
             Shop newShop = new Shop();
@@ -186,7 +195,7 @@ namespace WSFramework.Controllers
             {
                 if (ShopExists(newShop.Id))
                 {
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Shop ID already in use."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
                 }
                 else
                 {
@@ -203,11 +212,11 @@ namespace WSFramework.Controllers
         [ResponseType(typeof(Shop))]
         public async Task<IHttpActionResult> DeleteShop(long id)
         {
-            IdentityHelper identity = getIdentity();
+            CurrentIdentity identity = getIdentity();
             Shop shop = await db.Shops.FindAsync(id);
 
             if (shop == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Shop ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
             
 
             if (identity.userId == shop.UserId || identity.role == "Admin")
@@ -217,7 +226,7 @@ namespace WSFramework.Controllers
 
                 return Ok(shop);
             }
-            return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Forbidden, "You are not authorized to modify this data."));
+            return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
         }
 
         private async Task IncrementView(long id)
@@ -291,16 +300,46 @@ namespace WSFramework.Controllers
             return db.Shops.Count(e => e.Title == title) > 0;
         }
 
-        private IdentityHelper getIdentity()
+        private CurrentIdentity getIdentity()
         {
             var identity = (ClaimsIdentity)User.Identity;
             IEnumerable<Claim> claims = identity.Claims;
             string userId = claims.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
             string role = claims.FirstOrDefault(p => p.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").Value;
-            IdentityHelper identityOut = new IdentityHelper();
+            CurrentIdentity identityOut = new CurrentIdentity();
             identityOut.userId = userId;
             identityOut.role = role;
             return identityOut;
+        }
+
+        public HttpResponseMessage getHttpResponse(HttpStatusCode statusCode)
+        {
+            HttpResponseMessage resp = new HttpResponseMessage();
+            resp.StatusCode = statusCode;
+            string reasonPhrase;
+            switch (statusCode)
+            {
+                case HttpStatusCode.NotFound:
+                    reasonPhrase = "Shop ID not present in database.";
+                    break;
+                case HttpStatusCode.Conflict:
+                    reasonPhrase = "Shop title already taken.";
+                    break;
+                case HttpStatusCode.Forbidden:
+                    reasonPhrase = "User ID already has a shop.";
+                    break;
+                case HttpStatusCode.BadRequest:
+                    reasonPhrase = "isActive can only be 0 or 1. 0 is inactive. 1 is active.";
+                    break;
+                case HttpStatusCode.Unauthorized:
+                    reasonPhrase = "You are not authorized to modify this data.";
+                    break;
+                default:
+                    reasonPhrase = "Contact service provider.";
+                    break;
+            }
+            resp.ReasonPhrase = reasonPhrase;
+            return resp;
         }
     }
 }

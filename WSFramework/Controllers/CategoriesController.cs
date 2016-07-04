@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -11,7 +14,7 @@ using WSFramework.Models;
 
 namespace WSFramework.Controllers
 {
-    public class CategoriesController : ApiController
+    public class CategoriesController : ApiController, WSFController
     {
         private WSFrameworkDBEntitiesFull db = new WSFrameworkDBEntitiesFull();
 
@@ -33,7 +36,15 @@ namespace WSFramework.Controllers
         // GET: /Categories
         public IQueryable<Category> GetCategories()
         {
-            return db.Categories;
+            CurrentIdentity identity = getIdentity();
+            if (identity.role == "Admin")
+            {
+                return db.Categories;
+            }
+            else
+            {
+                return db.Categories.Where(p => p.IsActive == 1);
+            }
         }
 
         // GET: /Categories/5
@@ -42,7 +53,7 @@ namespace WSFramework.Controllers
         {
             Category category = await db.Categories.FindAsync(id);
             if (category == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Category ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             return Ok(category);
         }
@@ -57,16 +68,16 @@ namespace WSFramework.Controllers
 
             if (categoryIn.IsActive != 0)
                 if (categoryIn.IsActive != 1)
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.BadRequest, "IsActive can only be 0 or 1. 0 is inactive. 1 is active."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.BadRequest));
 
             Category categoryCurrent = await db.Categories.FindAsync(id);
 
             if (categoryCurrent == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Category ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             if (categoryCurrent.Title != categoryIn.Title)
                 if (CategoryTitleExists(categoryIn.Title))
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Category title already present in database."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
 
             categoryCurrent.Title = (categoryIn.Title != null) ? categoryIn.Title : categoryCurrent.Title;
             categoryCurrent.Description = (categoryIn.Description != null) ? categoryIn.Description : categoryCurrent.Description;
@@ -83,7 +94,7 @@ namespace WSFramework.Controllers
             {
                 if (!CategoryExists(id))
                 {
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Category ID not present in database."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
                 }
                 else
                 {
@@ -103,7 +114,7 @@ namespace WSFramework.Controllers
                 return BadRequest(ModelState);
 
             if (CategoryTitleExists(categoryIn.Title))
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Category title already present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
 
             Category newCategory = new Category();
             newCategory.Title = categoryIn.Title;
@@ -124,7 +135,7 @@ namespace WSFramework.Controllers
             {
                 if (CategoryExists(newCategory.Id))
                 {
-                    return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.Conflict, "Category ID already present in database."));
+                    return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
                 }
                 else
                 {
@@ -142,7 +153,7 @@ namespace WSFramework.Controllers
         {
             Category category = await db.Categories.FindAsync(id);
             if (category == null)
-                return ResponseMessage(HttpResponseHelper.getHttpResponse(HttpStatusCode.NotFound, "Category ID not present in database."));
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             db.Categories.Remove(category);
             await db.SaveChangesAsync();
@@ -169,5 +180,40 @@ namespace WSFramework.Controllers
             return db.Categories.Count(e => e.Title == title) > 0;
         }
 
+        private CurrentIdentity getIdentity()
+        {
+            var identity = (ClaimsIdentity)User.Identity;
+            IEnumerable<Claim> claims = identity.Claims;
+            string userId = claims.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+            string role = claims.FirstOrDefault(p => p.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").Value;
+            CurrentIdentity identityOut = new CurrentIdentity();
+            identityOut.userId = userId;
+            identityOut.role = role;
+            return identityOut;
+        }
+
+        public HttpResponseMessage getHttpResponse(HttpStatusCode statusCode)
+        {
+            HttpResponseMessage resp = new HttpResponseMessage();
+            resp.StatusCode = statusCode;
+            string reasonPhrase;
+            switch (statusCode)
+            {
+                case HttpStatusCode.NotFound:
+                    reasonPhrase = "Category ID not present in database.";
+                    break;
+                case HttpStatusCode.Conflict:
+                    reasonPhrase = "Category ID already present in database.";
+                    break;
+                case HttpStatusCode.BadRequest:
+                    reasonPhrase = "IsActive can only be 0 or 1. 0 is inactive. 1 is active.";
+                    break;
+                default:
+                    reasonPhrase = "Contact service provider.";
+                    break;
+            }
+            resp.ReasonPhrase = reasonPhrase;
+            return resp;
+        }
     }
 }
