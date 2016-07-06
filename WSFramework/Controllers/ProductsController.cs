@@ -41,7 +41,7 @@ namespace WSFramework.Controllers
         public IList<string> Images { get; set; }
         public IList<long> CategoryId { get; set; }
         public int Stock { get; set; }
-        public float Price { get; set; }
+        public float? Price { get; set; }
     }
 
     public class ProductsController : ApiController, WSFController
@@ -165,7 +165,7 @@ namespace WSFramework.Controllers
                 productCurrent.UpdatedAt = DateTime.Now;
                 productCurrent.IsActive = productIn.IsActive;
                 productCurrent.Stock = productIn.Stock;
-                productCurrent.Price = productIn.Price;
+                productCurrent.Price = (productIn.Price != null) ? productIn.Price : productCurrent.Price;
                 db.Entry(productCurrent).State = EntityState.Modified;
 
                 try
@@ -207,7 +207,7 @@ namespace WSFramework.Controllers
                     }
                     catch (DbUpdateConcurrencyException)
                     {
-
+                        throw;
                     }
                 }
 
@@ -234,9 +234,54 @@ namespace WSFramework.Controllers
                 }
                 catch (DbUpdateException)
                 {
-
+                    throw;
                 }
 
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
+        }
+
+        // PUT: /Products/5/Activate
+        [Route("Products/{productId}/Activate")]
+        [Authorize(Roles = "Admin, User")]
+        [ResponseType(typeof(void))]
+        [HttpPut]
+        public async Task<IHttpActionResult> ActivateProduct(long productId, ProductIn product)
+        {
+            CurrentIdentity identity = getIdentity();
+
+            Product productCurrent = await db.Products.FindAsync(productId);
+
+            if (productCurrent == null)
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
+
+            string userId = (await db.Shops.FindAsync(productCurrent.ShopId)).UserId;
+
+            if (identity.userId == userId || identity.role == "Admin")
+            {
+                if(productCurrent.IsActive == 0)
+                    productCurrent.IsActive = 1;
+                else
+                    productCurrent.IsActive = 0;
+
+                db.Entry(productCurrent).State = EntityState.Modified;
+
+                try
+                {
+                    await db.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ProductExists(productId))
+                    {
+                        return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
                 return StatusCode(HttpStatusCode.NoContent);
             }
             return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
