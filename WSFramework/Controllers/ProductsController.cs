@@ -55,8 +55,22 @@ namespace WSFramework.Controllers
         }
 
         // GET: /Products/5
-        [ResponseType(typeof(ProductOut))]
+        [ResponseType(typeof(Product))]
         public async Task<IHttpActionResult> GetProduct(long id)
+        {
+            Product product = await db.Products.FindAsync(id);
+            if (product == null)
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
+
+            await IncrementView(id);
+
+            return Ok(product);
+        }
+
+        // GET: /Products/5/Details
+        [Route("Products/{id}/Details")]
+        [ResponseType(typeof(ProductOut))]
+        public async Task<IHttpActionResult> GetProductDetails(long id)
         {
             Product product = await db.Products.FindAsync(id);
             if (product == null)
@@ -94,6 +108,26 @@ namespace WSFramework.Controllers
         [Route("Products/Own/")]
         [ResponseType(typeof(ProductOut))]
         public async Task<IHttpActionResult> GetProductOwn()
+        {
+            CurrentIdentity identity = getIdentity();
+            long shopId = (await db.Shops.Where(p => p.UserId == identity.userId).FirstOrDefaultAsync()).Id;
+            List<Product> products = await db.Products.Where(p => p.ShopId == shopId).ToListAsync();
+            if (products == null)
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
+
+            List<Product> productsOut = new List<Product>();
+            foreach (var product in products)
+            {
+                productsOut.Add(product);
+            }
+
+            return Ok(productsOut);
+        }
+
+        // GET: /Products/Own/Details
+        [Route("Products/Own/Details")]
+        [ResponseType(typeof(ProductOut))]
+        public async Task<IHttpActionResult> GetProductOwnDetails()
         {
             CurrentIdentity identity = getIdentity();
             long shopId = (await db.Shops.Where(p => p.UserId == identity.userId).FirstOrDefaultAsync()).Id;

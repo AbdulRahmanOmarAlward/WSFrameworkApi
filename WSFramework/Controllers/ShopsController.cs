@@ -101,7 +101,31 @@ namespace WSFramework.Controllers
 
             return Ok(shopOut);
         }
-        // PUT: /Shops/5+
+
+        // GET: /Shops/Own/Products
+        [Route("Shops/Own/Products")]
+        [ResponseType(typeof(ShopProducts))]
+        public async Task<IHttpActionResult> GetOwnShopProducts()
+        {
+            CurrentIdentity identity = getIdentity();
+            Shop shop = await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId);
+            if (shop == null)
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
+
+            ShopProducts shopOut = new ShopProducts();
+            shopOut.Products = new List<ProductOut>();
+            IList<Product> productsInShop = new List<Product>();
+            productsInShop = await db.Products.Where(p => p.ShopId == shop.Id).ToListAsync();
+
+            foreach (var product in productsInShop)
+            {
+                shopOut.Products.Add(await GetProductsForShop(product.Id));
+            }
+
+            return Ok(shopOut);
+        }
+
+        // PUT: /Shops/5
         [Route("Shops/{id}/")]
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(void))]
