@@ -33,5 +33,6 @@ namespace WSFramework.Models
         public virtual DbSet<ProductsToCategory> ProductsToCategories { get; set; }
         public virtual DbSet<Shop> Shops { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<ShopConfiguration> ShopConfigurations { get; set; }
     }
 }

@@ -86,6 +86,15 @@
           <Property Name="ProductId" Type="bigint" Nullable="false" />
           <Property Name="CategoryId" Type="bigint" Nullable="false" />
         </EntityType>
+        <EntityType Name="ShopConfiguration">
+          <Key>
+            <PropertyRef Name="ShopId" />
+          </Key>
+          <Property Name="ShopId" Type="bigint" Nullable="false" />
+          <Property Name="BgColor" Type="nvarchar" MaxLength="50" />
+          <Property Name="MenuColor" Type="nvarchar" MaxLength="50" />
+          <Property Name="LayoutId" Type="int" />
+        </EntityType>
         <EntityType Name="Shops">
           <Key>
             <PropertyRef Name="Id" />
@@ -108,6 +117,7 @@
           <EntitySet Name="OrdersToProducts" EntityType="Self.OrdersToProducts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Products" EntityType="Self.Products" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProductsToCategories" EntityType="Self.ProductsToCategories" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ShopConfiguration" EntityType="Self.ShopConfiguration" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Shops" EntityType="Self.Shops" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -204,6 +214,7 @@
           <EntitySet Name="ProductsToCategories" EntityType="Self.ProductsToCategory" />
           <EntitySet Name="Shops" EntityType="Self.Shop" />
           <EntitySet Name="Orders" EntityType="WSFrameworkDBModel.Order" />
+          <EntitySet Name="ShopConfigurations" EntityType="WSFrameworkDBModel.ShopConfiguration" />
         </EntityContainer>
         <EntityType Name="Order">
           <Key>
@@ -218,6 +229,15 @@
           <Property Name="Status" Type="Int32" Nullable="false" />
           <Property Name="ShopId" Type="Int64" Nullable="false" />
           <Property Name="Amount" Type="Double" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ShopConfiguration">
+          <Key>
+            <PropertyRef Name="ShopId" />
+          </Key>
+          <Property Name="ShopId" Type="Int64" Nullable="false" />
+          <Property Name="BgColor" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="MenuColor" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LayoutId" Type="Int32" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -323,6 +343,16 @@
                 <ScalarProperty Name="ShippingAddress" ColumnName="ShippingAddress" />
                 <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ShopConfigurations">
+            <EntityTypeMapping TypeName="WSFrameworkDBModel.ShopConfiguration">
+              <MappingFragment StoreEntitySet="ShopConfiguration">
+                <ScalarProperty Name="LayoutId" ColumnName="LayoutId" />
+                <ScalarProperty Name="MenuColor" ColumnName="MenuColor" />
+                <ScalarProperty Name="BgColor" ColumnName="BgColor" />
+                <ScalarProperty Name="ShopId" ColumnName="ShopId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

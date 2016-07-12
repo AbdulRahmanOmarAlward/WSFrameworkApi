@@ -13,6 +13,7 @@ using WSFramework.Helpers;
 using WSFramework.Controllers;
 using System.Net.Http;
 
+
 namespace WSFramework.Controllers
 {
     public class ShopIn
@@ -43,7 +44,7 @@ namespace WSFramework.Controllers
         public IQueryable<Shop> GetShops()
         {
             CurrentIdentity identity = getIdentity();
-            if(identity.role == "Admin")
+            if (identity.role == "Admin")
             {
                 return db.Shops;
             }
@@ -54,7 +55,6 @@ namespace WSFramework.Controllers
         }
 
         // GET: /Shops/5
-        [Route("Shops/{id}/")]
         [ResponseType(typeof(Shop))]
         public async Task<IHttpActionResult> GetShop(long id)
         {
@@ -126,31 +126,30 @@ namespace WSFramework.Controllers
         }
 
         // PUT: /Shops/5
-        [Route("Shops/{id}/")]
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutShop(long id, ShopUpdate shopIn)
+        public async Task<IHttpActionResult> PutShop(long id, Shop shopIn)
         {
             CurrentIdentity identity = getIdentity();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
-            if(shopIn.IsActive != 0)
-                if(shopIn.IsActive != 1)
+
+            if (shopIn.IsActive != 0)
+                if (shopIn.IsActive != 1)
                     return ResponseMessage(getHttpResponse(HttpStatusCode.BadRequest));
 
             Shop shopCurrent = await db.Shops.FindAsync(id);
             if (shopCurrent == null)
                 return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
-            
+
 
             if (identity.userId == shopCurrent.UserId || identity.role == "Admin")
             {
                 if (shopCurrent.Title != shopIn.Title)
                     if (ShopTitleExists(shopIn.Title))
                         return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
-                    
+
                 shopCurrent.Title = (shopIn.Title != null) ? shopIn.Title : shopCurrent.Title;
                 shopCurrent.Description = (shopIn.Description != null) ? shopIn.Description : shopCurrent.Description;
                 shopCurrent.DescriptionFull = (shopIn.DescriptionFull != null) ? shopIn.DescriptionFull : shopCurrent.DescriptionFull;
@@ -183,14 +182,14 @@ namespace WSFramework.Controllers
         // POST: /Shops
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(Shop))]
-        public async Task<IHttpActionResult> PostShop(ShopIn shop)
+        public async Task<IHttpActionResult> PostShop(Shop shop)
         {
             if (ShopTitleExists(shop.Title))
                 return ResponseMessage(getHttpResponse(HttpStatusCode.Conflict));
 
             CurrentIdentity identity = getIdentity();
 
-            if((await db.Shops.CountAsync(p => p.UserId == identity.userId)) > 0)
+            if ((await db.Shops.CountAsync(p => p.UserId == identity.userId)) > 0)
             {
                 return ResponseMessage(getHttpResponse(HttpStatusCode.Forbidden));
             }
@@ -208,7 +207,7 @@ namespace WSFramework.Controllers
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             db.Shops.Add(newShop);
 
             try
@@ -231,7 +230,6 @@ namespace WSFramework.Controllers
         }
 
         // DELETE: /Shops/5
-        [Route("Shops/{id}/")]
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(Shop))]
         public async Task<IHttpActionResult> DeleteShop(long id)
@@ -241,10 +239,43 @@ namespace WSFramework.Controllers
 
             if (shop == null)
                 return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
-            
+
 
             if (identity.userId == shop.UserId || identity.role == "Admin")
             {
+                List<Product> products = await db.Products.Where(p => p.ShopId == id).ToListAsync();
+
+                //Delete all products in shop
+                if (products != null)
+                {
+                    foreach (var product in products)
+                    {
+                        IList<Image> images = await db.Images.Where(p => p.ProductId == product.Id).ToListAsync();
+                        IList<ProductsToCategory> categories = await db.ProductsToCategories.Where(p => p.ProductId == product.Id).ToListAsync();
+
+                        ShopConfiguration shopConfig = await db.ShopConfigurations.FindAsync(id);
+
+                        //Delete shop config if it exsists
+                        if (shopConfig != null)
+                        {
+                            db.ShopConfigurations.Remove(shopConfig);
+                            await db.SaveChangesAsync();
+                        }
+
+                        db.Products.Remove(product);
+                        await db.SaveChangesAsync();
+                        foreach (var image in images)
+                        {
+                            db.Images.Remove(image);
+                        }
+                        foreach (var category in categories)
+                        {
+                            db.ProductsToCategories.Remove(category);
+                        }
+                        await db.SaveChangesAsync();
+                    }
+                }
+
                 db.Shops.Remove(shop);
                 await db.SaveChangesAsync();
 

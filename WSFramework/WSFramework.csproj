@@ -179,6 +179,7 @@
     <Compile Include="Controllers\CustomersController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
+    <Compile Include="Controllers\ShopConfigurationsController.cs" />
     <Compile Include="Controllers\ShopsController.cs" />
     <Compile Include="Controllers\UserRolesController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
@@ -223,6 +224,9 @@
       <DependentUpon>Roles.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\Shop.cs">
+      <DependentUpon>WSDatabase.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ShopConfiguration.cs">
       <DependentUpon>WSDatabase.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\User.Context.cs">
