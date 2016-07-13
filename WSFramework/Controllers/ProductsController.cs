@@ -387,7 +387,7 @@ namespace WSFramework.Controllers
                 }
                 catch (DbUpdateException)
                 {
-
+                    throw;
                 }
             }
 
@@ -407,7 +407,7 @@ namespace WSFramework.Controllers
                 }
                 catch (DbUpdateException)
                 {
-
+                    throw;
                 }
             }
 
@@ -458,6 +458,7 @@ namespace WSFramework.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
+                throw;
             }
         }
 

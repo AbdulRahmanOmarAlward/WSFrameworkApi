@@ -82,7 +82,7 @@ namespace WSFramework.Controllers
                     return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
             }
 
-            if (shopConfiguration.LayoutId > 1 || shopConfiguration.LayoutId < 0)
+            if (shopConfiguration.LayoutId < 0)
                 return ResponseMessage(getHttpResponse(HttpStatusCode.BadRequest));
 
             Shop shopCurrent = await db.Shops.FindAsync(id);

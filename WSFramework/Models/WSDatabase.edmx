@@ -94,6 +94,7 @@
           <Property Name="BgColor" Type="nvarchar" MaxLength="50" />
           <Property Name="MenuColor" Type="nvarchar" MaxLength="50" />
           <Property Name="LayoutId" Type="int" />
+          <Property Name="MenuTextColor" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Shops">
           <Key>
@@ -238,6 +239,7 @@
           <Property Name="BgColor" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="MenuColor" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="LayoutId" Type="Int32" />
+          <Property Name="MenuTextColor" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -349,6 +351,7 @@
           <EntitySetMapping Name="ShopConfigurations">
             <EntityTypeMapping TypeName="WSFrameworkDBModel.ShopConfiguration">
               <MappingFragment StoreEntitySet="ShopConfiguration">
+                <ScalarProperty Name="MenuTextColor" ColumnName="MenuTextColor" />
                 <ScalarProperty Name="LayoutId" ColumnName="LayoutId" />
                 <ScalarProperty Name="MenuColor" ColumnName="MenuColor" />
                 <ScalarProperty Name="BgColor" ColumnName="BgColor" />

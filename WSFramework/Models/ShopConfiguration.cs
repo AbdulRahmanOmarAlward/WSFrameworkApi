@@ -18,5 +18,6 @@ namespace WSFramework.Models
         public string BgColor { get; set; }
         public string MenuColor { get; set; }
         public Nullable<int> LayoutId { get; set; }
+        public string MenuTextColor { get; set; }
     }
 }

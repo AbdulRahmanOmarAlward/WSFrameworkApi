@@ -23,7 +23,7 @@ namespace WSFramework.Controllers
         public string DescriptionFull { get; set; }
     }
 
-    class ShopProducts
+    class ShopProducts : Shop
     {
         public IList<ProductOut> Products { get; set; }
     }
@@ -88,9 +88,19 @@ namespace WSFramework.Controllers
                 return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             ShopProducts shopOut = new ShopProducts();
+            shopOut.Id = shop.Id;
+            shopOut.UserId = shop.UserId;
+            shopOut.Title = shop.Title;
+            shopOut.Description = shop.Description;
+            shopOut.DescriptionFull = shop.DescriptionFull;
+            shopOut.Views = shop.Views;
+            shopOut.IsActive = shop.IsActive;
+            shopOut.CreatedAt = shop.CreatedAt;
+            shopOut.UpdatedAt = shop.UpdatedAt;
+
             shopOut.Products = new List<ProductOut>();
             IList<Product> productsInShop = new List<Product>();
-            productsInShop = await db.Products.Where(p => p.ShopId == id).ToListAsync();
+            productsInShop = await db.Products.Where(p => p.ShopId == id & p.IsActive == 1).ToListAsync();
 
             foreach (var product in productsInShop)
             {
@@ -113,6 +123,16 @@ namespace WSFramework.Controllers
                 return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
 
             ShopProducts shopOut = new ShopProducts();
+            shopOut.Id = shop.Id;
+            shopOut.UserId = shop.UserId;
+            shopOut.Title = shop.Title;
+            shopOut.Description = shop.Description;
+            shopOut.DescriptionFull = shop.DescriptionFull;
+            shopOut.Views = shop.Views;
+            shopOut.IsActive = shop.IsActive;
+            shopOut.CreatedAt = shop.CreatedAt;
+            shopOut.UpdatedAt = shop.UpdatedAt;
+
             shopOut.Products = new List<ProductOut>();
             IList<Product> productsInShop = new List<Product>();
             productsInShop = await db.Products.Where(p => p.ShopId == shop.Id).ToListAsync();
@@ -296,6 +316,7 @@ namespace WSFramework.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
+                throw;
             }
         }
 

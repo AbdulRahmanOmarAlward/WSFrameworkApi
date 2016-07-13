@@ -139,6 +139,7 @@ namespace WSFramework.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
+                throw;
             }
 
             return StatusCode(HttpStatusCode.NoContent);
@@ -181,7 +182,7 @@ namespace WSFramework.Controllers
             }
             catch (DbUpdateException)
             {
-
+                throw;
             }
 
             return CreatedAtRoute("WSApi", new { id = newCustomer.Id }, newCustomer);

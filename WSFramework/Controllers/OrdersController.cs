@@ -160,7 +160,7 @@ namespace WSFramework.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-
+                throw;
             }
 
             return StatusCode(HttpStatusCode.NoContent);
@@ -222,6 +222,7 @@ namespace WSFramework.Controllers
             }
             catch (DbUpdateException)
             {
+                throw;
             }
 
             if (orderIn.Products != null)
@@ -241,7 +242,7 @@ namespace WSFramework.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-
+                throw;
             }
 
             return CreatedAtRoute("WSApi", new { id = newOrder.Id }, newOrder);
@@ -259,6 +260,7 @@ namespace WSFramework.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
+                throw;
             }
         }
 
