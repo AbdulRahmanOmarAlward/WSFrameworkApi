@@ -292,6 +292,7 @@
     <Content Include="Models\WSDatabase.edmx.diagram">
       <DependentUpon>WSDatabase.edmx</DependentUpon>
     </Content>
+    <None Include="Properties\PublishProfiles\WSBackend.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

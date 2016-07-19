@@ -27,6 +27,7 @@ namespace WSFramework.Controllers
             public string Zip { get; set; }
             public string City { get; set; }
             public string Country { get; set; }
+            public long ShopId { get; set; }
         }
 
         // GET: /Customers
@@ -76,14 +77,14 @@ namespace WSFramework.Controllers
             }
         }
 
-        // GET: /Customers/5
+        // GET: /Customers/5/Orders
         [Route("Customers/{id}/Orders")]
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(IList<Order>))]
         public async Task<IHttpActionResult> GetCustomerOrders(long id)
         {
             CurrentIdentity identity = getIdentity();
-
+             
             if (identity.role == "Admin")
             {
                 return Ok(await db.Orders.Where(p => p.CustomerId == id).ToListAsync());
@@ -146,11 +147,9 @@ namespace WSFramework.Controllers
         }
 
         // POST: /Customers
-        [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(Customer))]
         public async Task<IHttpActionResult> PostCustomer(CustomerIn customer)
         {
-            CurrentIdentity identity = getIdentity();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -163,20 +162,11 @@ namespace WSFramework.Controllers
             newCustomer.Zip = customer.Zip;
             newCustomer.City = customer.City;
             newCustomer.Country = customer.Country;
-
-            if (identity.role == "Admin")
-            {
-                newCustomer.ShopId = 0;
-
-            }
-            else
-            {
-                newCustomer.ShopId = ((Shop)await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId)).Id;
-            }
+            newCustomer.ShopId = customer.ShopId;
 
             db.Customers.Add(newCustomer);
 
-            try
+            try 
             {
                 await db.SaveChangesAsync();
             }
