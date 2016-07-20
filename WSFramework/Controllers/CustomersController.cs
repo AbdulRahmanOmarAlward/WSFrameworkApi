@@ -47,6 +47,24 @@ namespace WSFramework.Controllers
             }
         }
 
+        // GET: /Customers/Own
+        [Route("Customers/Own")]
+        [Authorize(Roles = "Admin, User")]
+        [ResponseType(typeof(List<Customer>))]
+        public async Task<IHttpActionResult> GetOwnCustomers()
+        {
+            CurrentIdentity identity = getIdentity();
+            long shopId = (await db.Shops.Where(p => p.UserId == identity.userId).FirstOrDefaultAsync()).Id;
+
+            List<Customer> customers = await db.Customers.Where(p => p.ShopId == shopId).ToListAsync();
+
+            if (customers == null)
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
+
+            return Ok(customers);
+        }
+
+
         // GET: /Customers/5
         [Authorize(Roles = "Admin, User")]
         [ResponseType(typeof(Customer))]
@@ -97,7 +115,9 @@ namespace WSFramework.Controllers
                 long shopId = ((Shop)await db.Shops.FirstOrDefaultAsync(p => p.UserId == identity.userId)).Id;
                 if (customer.ShopId == shopId)
                 {
-                    return Ok(await db.Orders.Where(p => p.CustomerId == id).ToListAsync());
+                    List<Order> orders = new List<Order>();
+                    orders = await db.Orders.Where(p => p.CustomerId == id).ToListAsync();
+                    return Ok(orders);
                 }
                 else
                 {

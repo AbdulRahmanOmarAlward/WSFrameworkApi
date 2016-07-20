@@ -19,7 +19,7 @@ namespace WSFramework.Controllers
     {
         private WSFrameworkDBEntitiesFull db = new WSFrameworkDBEntitiesFull();
 
-        class OrderProducts
+        class OrderProducts : Order
         {
             public IList<ProductOutOrder> Products { get; set; }
         }
@@ -41,7 +41,7 @@ namespace WSFramework.Controllers
             public string ShippingAddress { get; set; }
             public string BillingAddress { get; set; }
             public int Status { get; set; }
-            public int Amount { get; set; }
+            public double Amount { get; set; }
         }
         public class OrderIn
         {
@@ -99,6 +99,23 @@ namespace WSFramework.Controllers
             }
         }
 
+        // GET: /Orders/Own
+        [Route("Orders/Own")]
+        [Authorize(Roles = "Admin, User")]
+        [ResponseType(typeof(List<Order>))]
+        public async Task<IHttpActionResult> GetOwnOrders()
+        {
+            CurrentIdentity identity = getIdentity();
+            long shopId = (await db.Shops.Where(p => p.UserId == identity.userId).FirstOrDefaultAsync()).Id;
+
+            List<Order> orders = await db.Orders.Where(p => p.ShopId == shopId).ToListAsync();
+
+            if (orders == null)
+                return ResponseMessage(getHttpResponse(HttpStatusCode.NotFound));
+
+            return Ok(orders);
+        }
+
         // GET: /Orders/5/products
         [Route("Orders/{id}/products")]
         [Authorize(Roles = "Admin, User")]
@@ -116,6 +133,17 @@ namespace WSFramework.Controllers
                     return ResponseMessage(getHttpResponse(HttpStatusCode.Unauthorized));
 
             OrderProducts orderOut = new OrderProducts();
+            orderOut.Id = order.Id;
+            orderOut.CustomerId = order.CustomerId;
+            orderOut.ShippingAddress = order.ShippingAddress;
+            orderOut.BillingAddress = order.BillingAddress;
+            orderOut.CreatedAt = order.CreatedAt;
+            orderOut.UpdatedAt = order.UpdatedAt;
+            orderOut.Status = order.Status;
+            orderOut.ShopId = order.ShopId;
+            orderOut.Amount = order.Amount;
+
+
             orderOut.Products = new List<ProductOutOrder>();
             IList<OrdersToProduct> productsInOrder = new List<OrdersToProduct>();
             productsInOrder = await db.OrdersToProducts.Where(p => p.OrderId == id).ToListAsync();
@@ -284,6 +312,7 @@ namespace WSFramework.Controllers
             productOut.Description = product.Description;
             productOut.DescriptionFull = product.DescriptionFull;
             productOut.Views = product.Views;
+            productOut.Price = product.Price;
             productOut.IsActive = product.IsActive;
             productOut.CreatedAt = product.CreatedAt;
             productOut.UpdatedAt = product.UpdatedAt;
